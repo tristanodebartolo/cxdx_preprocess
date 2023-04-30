@@ -1,0 +1,5 @@
+name: 'Cxdx pretreatment'
+type: module
+description: 'Preprocess for nodes, terms, medias, users or others entities.'
+core_version_requirement: ^9.3 || ^10
+package: 'cxdx'
