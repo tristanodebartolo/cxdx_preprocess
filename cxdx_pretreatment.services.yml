@@ -1,0 +1,4 @@
+services:
+  cxdx_pretreatment.builder:
+    class: Drupal\cxdx_pretreatment\Service\CxdxPretreatmentService
+    arguments: ['@current_user', '@entity_type.manager', '@state', '@module_handler', '@current_route_match']
