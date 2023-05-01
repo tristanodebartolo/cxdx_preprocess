@@ -54,14 +54,14 @@ class CxdxPretreatmentService implements CxdxPretreatmentServiceInterface {
   /**
    * @var \Drupal\Core\Session\AccountInterface
    */
-  protected $acc;
+  protected $account;
 
   /**
    * Drupal\Core\Entity\EntityTypeManagerInterface definition.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $et;
+  protected $entity_manager;
 
   /**
    * The state keyvalue collection.
@@ -75,39 +75,39 @@ class CxdxPretreatmentService implements CxdxPretreatmentServiceInterface {
    *
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected $mh;
+  protected $module_handler;
 
   /**
    * The current route match.
    *
    * @var \Drupal\Core\Routing\CurrentRouteMatch
    */
-  protected $crm;
+  protected $current_route_match;
 
   /**
-   * @param \Drupal\Core\Session\AccountInterface $acc
+   * @param \Drupal\Core\Session\AccountInterface $account
    *    The current user
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $et
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_manager
    *    The entity type manager.
    * @param \Drupal\Core\State\StateInterface $state
    *    The state keyvalue collection service
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $mh
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *    The module handler.
-   * @param \Drupal\Core\Routing\CurrentRouteMatch $crm
+   * @param \Drupal\Core\Routing\CurrentRouteMatch $current_route_match
    *   The current route match.
    */
   public function __construct(
-    AccountInterface $acc,
-    EntityTypeManagerInterface $et,
+    AccountInterface $account,
+    EntityTypeManagerInterface $entity_manager,
     StateInterface $state,
-    ModuleHandlerInterface $mh,
-    CurrentRouteMatch $crm
+    ModuleHandlerInterface $module_handler,
+    CurrentRouteMatch $current_route_match
   ) {
-    $this->acc = $acc;
-    $this->et = $et;
+    $this->account = $account;
+    $this->entity_manager = $entity_manager;
     $this->state = $state;
-    $this->mh = $mh;
-    $this->crm = $crm;
+    $this->module_handler = $module_handler;
+    $this->current_route_match = $current_route_match;
   }
 
   /**
@@ -115,7 +115,7 @@ class CxdxPretreatmentService implements CxdxPretreatmentServiceInterface {
    */
   function modulePathByName($module_name): ?string
   {
-    return $this->mh->moduleExists($module_name) ? $this->mh->getModule($module_name)->getPath() : NULL;
+    return $this->module_handler->moduleExists($module_name) ? $this->module_handler->getModule($module_name)->getPath() : NULL;
   }
 
   /**
@@ -123,7 +123,7 @@ class CxdxPretreatmentService implements CxdxPretreatmentServiceInterface {
    */
   function moduleExist($module_name): ?bool
   {
-    return (bool)$this->mh->moduleExists($module_name);
+    return (bool)$this->module_handler->moduleExists($module_name);
   }
 
   /**
@@ -131,7 +131,7 @@ class CxdxPretreatmentService implements CxdxPretreatmentServiceInterface {
    */
   function isCurrentRoute(string $route): ?bool
   {
-    $route_name = $this->crm->getRouteName();
+    $route_name = $this->current_route_match->getRouteName();
     return $route_name == $route;
   }
 
@@ -140,10 +140,11 @@ class CxdxPretreatmentService implements CxdxPretreatmentServiceInterface {
    */
   function routeName(): ?string
   {
-    return $this->crm->getRouteName();
+    return $this->current_route_match->getRouteName();
   }
 
 }
+
 ```
 
 #### Injection de services dans le service
@@ -151,43 +152,43 @@ class CxdxPretreatmentService implements CxdxPretreatmentServiceInterface {
 Nous allons avoir besoin de faire différents traitements, mais également de savoir qui est l'utilisateur actuellement connecter ou encore nous allons avoir besoin de connaitre le nom de la route de la page courante, pour disposer de ces différents services à l'appel du notre, nous allons les déclarer dans le constructeur de notre classe `CxdxPretreatmentService`.
 
 ```php
-  /**
-   * @param \Drupal\Core\Session\AccountInterface $acc
-   *    The current user
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $et
-   *    The entity type manager.
-   * @param \Drupal\Core\State\StateInterface $state
-   *    The state keyvalue collection service
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $mh
-   *    The module handler.
-   * @param \Drupal\Core\Routing\CurrentRouteMatch $crm
-   *   The current route match.
-   */
-  public function __construct(
-    AccountInterface $acc,
-    EntityTypeManagerInterface $et,
-    StateInterface $state,
-    ModuleHandlerInterface $mh,
-    CurrentRouteMatch $crm
-  ) {
-    $this->acc = $acc;
-    $this->et = $et;
-    $this->state = $state;
-    $this->mh = $mh;
-    $this->crm = $crm;
-  }
+/**
+ * @param \Drupal\Core\Session\AccountInterface $account
+ *    The current user
+ * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_manager
+ *    The entity type manager.
+ * @param \Drupal\Core\State\StateInterface $state
+ *    The state keyvalue collection service
+ * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+ *    The module handler.
+ * @param \Drupal\Core\Routing\CurrentRouteMatch $current_route_match
+ *   The current route match.
+ */
+public function __construct(
+  AccountInterface $account,
+  EntityTypeManagerInterface $entity_manager,
+  StateInterface $state,
+  ModuleHandlerInterface $module_handler,
+  CurrentRouteMatch $current_route_match
+) {
+  $this->account = $account;
+  $this->entity_manager = $entity_manager;
+  $this->state = $state;
+  $this->module_handler = $module_handler;
+  $this->current_route_match = $current_route_match;
+}
 ```
 
 Ainsi, en déclarant le service `ModuleHandlerInterface` dans notre service, nous disposons de toutes ses méthodes. En appellant la méthode `moduleExists`, nous pouvons savoir si un module est installé ou pas.
 
 ```php
-  /**
-   * {@inheritdoc}
-   */
-  function modulePathByName($module_name): ?string
-  {
-    return $this->mh->moduleExists($module_name) ? $this->mh->getModule($module_name)->getPath() : NULL;
-  }
+/**
+ * {@inheritdoc}
+ */
+function modulePathByName($module_name): ?string
+{
+  return $this->mh->moduleExists($module_name) ? $this->mh->getModule($module_name)->getPath() : NULL;
+}
 ```
 
 ### Interface du Service 
@@ -383,14 +384,14 @@ Pour disposer du jeu de configuration de Drupal, nous injectons dans le containe
 
 ```php
 /**
-   * {@inheritDoc}
-   */
-  public static function create(ContainerInterface $container): PreprocessBase {
-    /* @phpstan-ignore-next-line */
-    return new static(
-      $container->get('config.factory')
-    );
-  }
+ * {@inheritDoc}
+ */
+public static function create(ContainerInterface $container): PreprocessBase {
+  /* @phpstan-ignore-next-line */
+  return new static(
+    $container->get('config.factory')
+  );
+}
 ```
 
 ### Interface PreprocessBaseInterface
@@ -423,7 +424,6 @@ interface PreprocessBaseInterface {
    *   throw template_preprocess_{theme}.
    */
   public function main(array &$variables): void;
-
 }
 ```
 
@@ -464,17 +464,17 @@ final class NodePreprocess extends PreprocessBase {
    *
    * @var \Drupal\cxdx_pretreatment\Service\CxdxPretreatmentService
    */
-  private CxdxPretreatmentService $cps;
+  private CxdxPretreatmentService $pretreatment_service;
 
   /**
    * @param \Drupal\path_alias\AliasManagerInterface $alias_manager
    *    The alias manager.
-   * @param \Drupal\cxdx_pretreatment\Service\CxdxPretreatmentService $cps
+   * @param \Drupal\cxdx_pretreatment\Service\CxdxPretreatmentService $pretreatment_service
    *    The CxdxPreprocessService service
    */
-  public function __construct(AliasManagerInterface $alias_manager, CxdxPretreatmentService $cps) {
+  public function __construct(AliasManagerInterface $alias_manager, CxdxPretreatmentService $pretreatment_service) {
     $this->aliasManager = $alias_manager;
-    $this->cps = $cps;
+    $this->pretreatment_service = $pretreatment_service;
   }
 
   /**
@@ -491,7 +491,9 @@ final class NodePreprocess extends PreprocessBase {
    * {@inheritDoc}
    */
   public function main(array &$variables): void {
+    // Get current node
     $node = $variables['node'];
+    // Stire the id and the bundle
     $nid = $node->id();
     $bundle = $node->bundle();
     // Store the nid and the bunble of the content type
@@ -514,16 +516,16 @@ Puis, après avoir renseigné le `construct` et la fonction `create` pour l'inje
 
 ```php
 /**
-   * {@inheritDoc}
-   */
-  public function main(array &$variables): void {
-    $node = $variables['node'];
-    $nid = $node->id();
-    $bundle = $node->bundle();
-    // Store the nid and the bunble of the content type
-    $variables['nid'] = $nid;
-    $variables['bundle'] = $bundle;
-  }
+ * {@inheritDoc}
+ */
+public function main(array &$variables): void {
+  $node = $variables['node'];
+  $nid = $node->id();
+  $bundle = $node->bundle();
+  // Store the nid and the bunble of the content type
+  $variables['nid'] = $nid;
+  $variables['bundle'] = $bundle;
+}
 ```
 
 ## Injecter le nouveau preprocess dans les `nodes`

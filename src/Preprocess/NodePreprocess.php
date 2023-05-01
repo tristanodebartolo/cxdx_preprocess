@@ -26,17 +26,17 @@ final class NodePreprocess extends PreprocessBase {
    *
    * @var \Drupal\cxdx_pretreatment\Service\CxdxPretreatmentService
    */
-  private CxdxPretreatmentService $cps;
+  private CxdxPretreatmentService $pretreatment_service;
 
   /**
    * @param \Drupal\path_alias\AliasManagerInterface $alias_manager
    *    The alias manager.
-   * @param \Drupal\cxdx_pretreatment\Service\CxdxPretreatmentService $cps
+   * @param \Drupal\cxdx_pretreatment\Service\CxdxPretreatmentService $pretreatment_service
    *    The CxdxPreprocessService service
    */
-  public function __construct(AliasManagerInterface $alias_manager, CxdxPretreatmentService $cps) {
+  public function __construct(AliasManagerInterface $alias_manager, CxdxPretreatmentService $pretreatment_service) {
     $this->aliasManager = $alias_manager;
-    $this->cps = $cps;
+    $this->pretreatment_service = $pretreatment_service;
   }
 
   /**

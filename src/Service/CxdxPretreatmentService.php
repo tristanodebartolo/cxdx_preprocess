@@ -23,14 +23,14 @@ class CxdxPretreatmentService implements CxdxPretreatmentServiceInterface {
   /**
    * @var \Drupal\Core\Session\AccountInterface
    */
-  protected $acc;
+  protected $account;
 
   /**
    * Drupal\Core\Entity\EntityTypeManagerInterface definition.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $et;
+  protected $entity_manager;
 
   /**
    * The state keyvalue collection.
@@ -44,39 +44,39 @@ class CxdxPretreatmentService implements CxdxPretreatmentServiceInterface {
    *
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected $mh;
+  protected $module_handler;
 
   /**
    * The current route match.
    *
    * @var \Drupal\Core\Routing\CurrentRouteMatch
    */
-  protected $crm;
+  protected $current_route_match;
 
   /**
-   * @param \Drupal\Core\Session\AccountInterface $acc
+   * @param \Drupal\Core\Session\AccountInterface $account
    *    The current user
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $et
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_manager
    *    The entity type manager.
    * @param \Drupal\Core\State\StateInterface $state
    *    The state keyvalue collection service
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $mh
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *    The module handler.
-   * @param \Drupal\Core\Routing\CurrentRouteMatch $crm
+   * @param \Drupal\Core\Routing\CurrentRouteMatch $current_route_match
    *   The current route match.
    */
   public function __construct(
-    AccountInterface $acc,
-    EntityTypeManagerInterface $et,
+    AccountInterface $account,
+    EntityTypeManagerInterface $entity_manager,
     StateInterface $state,
-    ModuleHandlerInterface $mh,
-    CurrentRouteMatch $crm
+    ModuleHandlerInterface $module_handler,
+    CurrentRouteMatch $current_route_match
   ) {
-    $this->acc = $acc;
-    $this->et = $et;
+    $this->account = $account;
+    $this->entity_manager = $entity_manager;
     $this->state = $state;
-    $this->mh = $mh;
-    $this->crm = $crm;
+    $this->module_handler = $module_handler;
+    $this->current_route_match = $current_route_match;
   }
 
   /**
@@ -84,7 +84,7 @@ class CxdxPretreatmentService implements CxdxPretreatmentServiceInterface {
    */
   function modulePathByName($module_name): ?string
   {
-    return $this->mh->moduleExists($module_name) ? $this->mh->getModule($module_name)->getPath() : NULL;
+    return $this->module_handler->moduleExists($module_name) ? $this->module_handler->getModule($module_name)->getPath() : NULL;
   }
 
   /**
@@ -92,7 +92,7 @@ class CxdxPretreatmentService implements CxdxPretreatmentServiceInterface {
    */
   function moduleExist($module_name): ?bool
   {
-    return (bool)$this->mh->moduleExists($module_name);
+    return (bool)$this->module_handler->moduleExists($module_name);
   }
 
   /**
@@ -100,7 +100,7 @@ class CxdxPretreatmentService implements CxdxPretreatmentServiceInterface {
    */
   function isCurrentRoute(string $route): ?bool
   {
-    $route_name = $this->crm->getRouteName();
+    $route_name = $this->current_route_match->getRouteName();
     return $route_name == $route;
   }
 
@@ -109,7 +109,7 @@ class CxdxPretreatmentService implements CxdxPretreatmentServiceInterface {
    */
   function routeName(): ?string
   {
-    return $this->crm->getRouteName();
+    return $this->current_route_match->getRouteName();
   }
 
 }
