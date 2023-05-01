@@ -1,0 +1,13 @@
+<?php
+
+use Drupal\cxdx_pretreatment\Preprocess\NodePreprocess;
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function cxdx_pretreatment_preprocess_node(array &$variables): void {
+  \Drupal::messenger()->addMessage('cxdx_pretreatment');
+  /** @var Drupal\cxdx_pretreatment\Preprocess\NodePreprocess $nodePreprocess */
+  $nodePreprocess = Drupal::classResolver(NodePreprocess::class);
+  $nodePreprocess->main($variables);
+}
